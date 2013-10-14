@@ -2,9 +2,7 @@ package models
 
 import scala.collection.mutable.{ListBuffer, Queue, LinkedList}
 import play.api.libs.json._
-import models.Output
 import play.api.libs.json.JsSuccess
-import models.OutputError
 import scala.Some
 
 /**
@@ -22,51 +20,6 @@ class MessageRelayCategory(category_p:String,relaySubNets_p:String,messageThroug
    val subNetNumbers = 254
 }
 
-object Input {
-    implicit object InputFormat extends Format[Input] {
-      def reads(json:JsValue): JsResult[Input] = {
-        val message = (json \ "message").as[String]
-        val recipients = (json \ "recipients").as[List[String]].to[ListBuffer]
-        JsSuccess(Input(message,recipients))
-      }
-
-      def writes(s:Input):JsValue = {
-
-         val retJson = Json.toJson(Map(
-             "message" -> s.message,
-             "recipients" -> s.telNumbers
-         ))
-
-         retJson
-    }
-}
-
-//TODO:
-object Output {
-
-}
-
-case class Input(message:String, telNumbers:ListBuffer[String])
-
-class NetRoute(ip_p:String,recipient_p:ListBuffer[String]) {
-  var ip = ip_p
-  var recipients = recipient_p
-}
-
-sealed trait OutputT {
-  var message:Option[String] = None
-  var routes:ListBuffer[NetRoute] = ListBuffer[NetRoute]()
-  var reason:Option[String] = None
-  var code:Int = 0
-}
-
-case class Output() extends OutputT
-
-case class OutputError(code_p:Int,message_p:String,reason_p:String) extends OutputT {
-    reason = Some(reason_p)
-    message = Some(message_p)
-    code = code_p
-}
 
 
 object dispatcher {
@@ -113,7 +66,6 @@ object dispatcher {
         )
 
         output
-
-
     }
 }
+
